@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: projectmanager
+spec:
+  selector:
+    matchLabels:
+      app: projectmanager
+  template:
+    metadata:
+      labels:
+        app: projectmanager
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-projectmanager
+        image: tango_project_manager
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /code
+            name: projectmanagervol
+          - mountPath: /shared
+            name : sharedvol 
+        env:
+        - name: POSTGRES_NAME
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        - name: postgres-port
+          value: "5432"
+        # - name: POD_IP
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.podIP
+        - name: POSTGRESQL_SERVICE_IP
+          value: postgresservice
+        
+        # - name: DB_HOST
+        #   value: postgresservice
+        ports:
+        - containerPort: 8085
+        command: ["/bin/sh", '-c']   
+        args: ["chmod 777 ./wait_for_postgres.sh && 
+               ./wait_for_postgres.sh &&
+               python manage.py makemigrations &&
+               python manage.py migrate &&
+               python manage.py loaddata base_model_data.json &&
+               python manage.py runserver 0.0.0.0:8085"]
+
+      volumes:
+        - name: projectmanagervol
+          persistentVolumeClaim:
+            claimName: pvcnfs-prm
+        - name: sharedvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-shared
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: projectmanagerservice
+spec:
+  type: NodePort     
+  ports:
+  - port: 8085       
+    targetPort: 8085   
+    nodePort: 10000
+  selector:
+    app: projectmanager

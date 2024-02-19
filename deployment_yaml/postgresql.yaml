@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+spec:
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:latest
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        volumeMounts:
+          - mountPath: /kubvar/lib/postgresql/data
+            name: postgresvol
+        env:
+        - name: POSTGRES_NAME
+          value: postgres
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        ports:
+        - containerPort: 5432
+      volumes:
+        - name: postgresvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-postgresql
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresservice
+spec:
+  selector:
+    app: postgresql
+  ports:
+  - name: postgres-port
+    port: 5432
+    targetPort: 5432

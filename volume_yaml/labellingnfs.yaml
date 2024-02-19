@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-labelling-dataset
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: labelling-dataset
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-labelling-dataset
+  labels:
+    name: labelling-dataset
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /home/etri-1/TANGO/labelling/dataset
+  # persistentVolumeReclaimPolicy: Recycle
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/labelling/dataset
+  #   server: 192.168.0.181
+
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-labelling-datadb
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: labelling-datadb
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-labelling-datadb
+  labels:
+    name: labelling-datadb
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /home/etri-1/TANGO/labelling/datadb
+  # persistentVolumeReclaimPolicy: Recycle
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/labelling/datadb
+  #   server: 192.168.0.181
+    
+
+    

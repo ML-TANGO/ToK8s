@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-viz2code
+  labels:
+    name: viz2code
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/TANGO/visualization/viz2code/
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/visualization/viz2code/
+  #   server: 192.168.0.181
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-viz2code
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: viz2code
+  accessModes:
+    - ReadWriteMany

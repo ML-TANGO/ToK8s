@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: viz2code
+spec:
+  selector:
+    matchLabels:
+      app: viz2code
+  template:
+    metadata:
+      labels:
+        app: viz2code
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-viz2code
+        image: tango_viz2code
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /source
+            name: viz2codevol
+        env:
+        - name: postgres-port
+          value: "5432"
+        - name: POSTGRESQL_SERVICE_HOST
+          value: postgresservice
+        ports:
+        - containerPort: 8091
+        command: ["/bin/sh", '-c']   
+        args: ["cd ./frontend && echo 1 &&
+
+                npm run build && echo 3 &&
+                cd .. python manage.py makemigrations && echo 4 &&
+                python manage.py migrate && echo 5 &&
+                python manage.py runserver react 0.0.0.0:8091 && echo 6"]
+      volumes:
+      - name: viz2codevol
+        persistentVolumeClaim:
+          claimName: pvcnfs-viz2code
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: viz2codeservice
+spec:
+  type: NodePort 
+  selector:
+    app: viz2code
+  ports:
+  - port: 8091
+    targetPort: 8091
+    nodePort: 8091
+
+

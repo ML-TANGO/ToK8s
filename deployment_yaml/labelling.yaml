@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: labelling
+spec:
+  selector:
+    matchLabels:
+      app: labelling
+  template:
+    metadata:
+      labels:
+        app: labelling
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-labelling
+        image: tango_labelling
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /var/appdata
+            name: labellingvol
+          - mountPath: /var/lib/mysql
+            name: labellingvoll
+        ports:
+        - containerPort: 80     # for Web UI
+        - containerPort: 10236  # for Rest API
+      volumes:
+        - name: labellingvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-labelling-dataset
+        - name: labellingvoll
+          persistentVolumeClaim:
+            claimName: pvcnfs-labelling-datadb
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: labellingservice
+spec:
+  type: NodePort
+  selector:
+    app: labelling
+  ports:
+  - port: 8086
+    targetPort: 80
+    nodePort: 8086
+    name: http
+  - port: 8095
+    targetPort: 10236
+    name: httpf
+    nodePort: 8095

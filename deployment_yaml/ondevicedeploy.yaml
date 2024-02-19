@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ondevice
+spec:
+  selector:
+    matchLabels:
+      app: ondevice
+  template:
+    metadata:
+      labels:
+        app: ondevice
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-ondevice
+        image: tango_ondevice_deploy
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /tango
+            name: ondevicevol
+        ports:
+        - containerPort: 8891
+        command: ["/bin/sh", '-c']   
+        args: ["cd /app && python3 ondevice_deploy.py"]
+      volumes:
+      - name: ondevicevol
+        persistentVolumeClaim:
+          claimName: pvcnfs-shared
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ondeviceservice
+spec:
+  selector:
+    app: ondevice
+  ports:
+  - port: 8891
+    targetPort: 8891
+---
+

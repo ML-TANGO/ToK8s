@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autonnnk
+spec:
+  selector:
+    matchLabels:
+      app: autonnnk
+  template:
+    metadata:
+      labels:
+        app: autonnnk
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-autonnnk
+        image: tango_autonn_nk
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /source
+            name: autonnnkvol
+          - mountPath: /shared
+            name : sharedvol 
+          - mountPath: /dev/shm
+            name: shmdir
+        # env:
+        #   - name: POSTGRESQL_SERVICE_IP
+        #     value: postgresservice
+        ports:
+        - containerPort: 8089
+        command: ["/bin/sh", '-c']   
+        args: ["python manage.py makemigrations &&
+                python manage.py migrate &&
+                python manage.py runserver 0.0.0.0:8089"]
+      volumes:
+        - name: autonnnkvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-autonnnk
+        - name: sharedvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-shared
+        - name: shmdir
+          emptyDir:
+            medium: Memory
+            sizeLimit: "10G"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: autonnnkservice
+spec:
+  selector:
+    app: autonnnk
+  ports:
+  - port: 8089
+    targetPort: 8089

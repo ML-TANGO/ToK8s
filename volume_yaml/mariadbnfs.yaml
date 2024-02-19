@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-mariadb-conf
+  labels:
+    name: mariadb-conf
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/TANGO/labelling/Deployment/db
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/labelling/Deployment/db
+  #   server: 192.168.0.181
+
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-mariadb-conf
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: mariadb-conf
+  accessModes:
+    - ReadWriteMany
+
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-mariadb-mysql
+  labels:
+    name: mariadb-mysql 
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/TANGO/labelling/data
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1 
+  # nfs:
+  #   path: /home/etri-1/TANGO/labelling/data
+  #   server: 192.168.0.181
+
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-mariadb-mysql
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: mariadb-mysql
+  accessModes:
+    - ReadWriteMany
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-mariadb-test
+  labels:
+    name: pvcnfs-mariadb-test
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/TANGO/labelling/Deployment/test/
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/labelling/Deployment/test/
+  #   server: 192.168.0.181
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-mariadb-test
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: pvcnfs-mariadb-test
+  accessModes:
+    - ReadWriteMany
+
+
+

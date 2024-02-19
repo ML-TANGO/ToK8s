@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autonnbb
+spec:
+  selector:
+    matchLabels:
+      app: autonnbb
+  template:
+    metadata:
+      labels:
+        app: autonnbb
+    spec:
+      containers:
+      - name: tango-autonnbb
+        image: tango_autonn_bb
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /source
+            name: autonnbbvol
+          - mountPath: /shared
+            name : sharedvol 
+          - mountPath: /dev/shm
+            name: shmdir
+        env:
+          - name: POSTGRESQL_SERVICE_IP
+            value: postgresservice
+        ports:
+        - containerPort: 8087
+        command: ["/bin/sh", '-c']   
+        args: ["python manage.py makemigrations &&
+                python manage.py migrate &&
+                python manage.py runserver 0.0.0.0:8087"]
+      volumes:
+        - name: autonnbbvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-autonnbb
+        - name: sharedvol
+          persistentVolumeClaim:
+            claimName: pvcnfs-shared
+        - name: shmdir
+          emptyDir:
+            medium: Memory
+            sizeLimit: "10G"
+
+---
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: autonnbbservice
+spec:
+  type: NodePort
+  selector:
+    app: autonnbb
+  ports:
+  - port: 8087
+    targetPort: 8087 
+    nodePort: 8087
+
+
+

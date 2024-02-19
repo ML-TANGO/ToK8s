@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bms
+spec:
+  selector:
+    matchLabels:
+      app: bms
+  template:
+    metadata:
+      labels:
+        app: bms
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-bms
+        image: tango_bms
+        imagePullPolicy: Never
+        # resources:
+        #   limits:
+        #     cpu: 2000m
+        #     memory: 2048Mi
+        volumeMounts:
+          - mountPath: /source
+            name: bmsvol
+          - mountPath: /shared
+            name: sharedvol
+        ports:
+        - containerPort: 8081
+        
+        command: ["/bin/sh", '-c']   
+        args: ["python generate_txt_file.py &&
+                python manage.py makemigrations &&
+                python manage.py migrate &&
+                python manage.py runserver 0.0.0.0:8081"]
+
+      volumes:
+      - name: bmsvol
+        persistentVolumeClaim:
+          claimName: pvcnfs-bms
+      - name: sharedvol
+        persistentVolumeClaim:
+          claimName: pvcnfs-shared
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: bmsservice
+spec:
+  type: NodePort
+  selector:
+    app: bms
+  ports:
+  - port: 8081
+    targetPort: 8081
+    nodePort: 8081

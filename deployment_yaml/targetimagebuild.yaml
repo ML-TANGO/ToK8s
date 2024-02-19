@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: targetimagebuild
+spec:
+  selector:
+    matchLabels:
+      app: targetimagebuild
+  template:
+    metadata:
+      labels:
+        app: targetimagebuild
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-targetimagebuild
+        image: tango_target_image_build
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2048Mi
+        volumeMounts:
+          - mountPath: /source
+            name: tibvol
+          - mountPath: /var/run
+            name: tibsockvol
+            # subPath: docker.sock
+        ports:
+        - containerPort: 8088
+        command: ["/bin/sh", '-c', "python main.py"]   
+        # args: ["python main.py"]
+      volumes:
+      - name: tibvol
+        persistentVolumeClaim:
+          claimName: pvcnfs-tib
+      - name: tibsockvol
+        hostPath:
+          path: "/var/run"
+
+
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: targetimagebuildservice
+spec:
+  type: NodePort
+  selector:
+    app: targetimagebuild
+  ports:
+  - port: 8088
+    targetPort: 8088
+    nodePort: 8088

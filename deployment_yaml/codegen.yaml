@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codegen
+spec:
+  selector:
+    matchLabels:
+      app: codegen
+  template:
+    metadata:
+      labels:
+        app: codegen
+    spec:
+      nodeName: etri-1
+      containers:
+      - name: tango-codegen
+        image: tango_code_gen
+        imagePullPolicy: Never
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1024Mi
+        volumeMounts:
+          - mountPath: /tango
+            name: codegenvol
+        ports:
+        - containerPort: 8888
+        command: ["/bin/sh", '-c']   
+        args: ["cd /app && python3 code_gen.py"]
+      volumes:
+      - name: codegenvol
+        persistentVolumeClaim:
+          claimName: pvcnfs-shared
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: codegenservice
+spec:
+  selector:
+    app: codegen
+  ports:
+  - port: 8888
+    targetPort: 8888
+

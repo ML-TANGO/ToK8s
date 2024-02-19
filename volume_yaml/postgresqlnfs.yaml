@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-postgresql
+spec:
+  resources:
+    requests:
+      storage: 6Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: pvcnfs-postgresql
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-postgresql
+  labels:
+    name: pvcnfs-postgresql
+spec:
+  capacity:
+    storage: 6Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/soonwoo/postgreSQL
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/soonwoo/postgreSQL
+  #   server: 192.168.0.181  
+    

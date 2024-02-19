@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-autonnbb
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: autonnbb
+  accessModes:
+    - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-autonnbb
+  labels:
+    name: autonnbb
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  # hostPath:
+  #   path: /home/etri-1/TANGO/autonn/backbone_nas
+  
+  nfs:
+    path: /home/etri-1/TANGO/autonn/backbone_nas
+    server: 192.168.0.181
+    
+
+#     apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: pvcnfs-autonnbb
+# spec:
+#   resources:
+#     requests:
+#       storage: 5Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteMany
+# ---
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: pvnfs-autonnbb
+#   labels:
+#     name: autonnbb
+# spec:
+#   capacity:
+#     storage: 5Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteMany
+#   persistentVolumeReclaimPolicy: Recycle
+#   hostPath:
+#     path: /your/host/path 

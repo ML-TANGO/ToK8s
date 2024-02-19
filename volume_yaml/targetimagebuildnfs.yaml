@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-tib
+  labels:
+    name: tib
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /home/etri-1/TANGO/target_image_build
+  # mountOptions:
+  #   - hard
+  #   - nfsvers=4.1
+  # nfs:
+  #   path: /home/etri-1/TANGO/target_image_build
+  #   server: 192.168.0.181
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-tib
+spec:
+  resources:
+    requests:
+      storage: 5Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: tib
+  accessModes:
+    - ReadWriteMany
+
+# ---
+
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:
+#   name: pvnfs-tibsock
+#   labels:
+#     name: tibsock
+# spec:
+#   capacity:
+#     storage: 5Gi
+#   volumeMode: Filesystem
+#   accessModes:
+#     - ReadWriteMany
+#   persistentVolumeReclaimPolicy: Recycle
+#   mountOptions:
+#     - hard
+#     - nfsvers=4.1
+#   nfs:
+#     path: /home/etri-1/TANGO/target_image_build
+#     server: 192.168.0.181
+
+# ---
+
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: pvcnfs-tibsock
+# spec:
+#   resources:
+#     requests:
+#       storage: 5Gi
+#   volumeMode: Filesystem
+#   selector:
+#     matchLabels:
+#       name: tibsock
+#   accessModes:
+#     - ReadWriteMany

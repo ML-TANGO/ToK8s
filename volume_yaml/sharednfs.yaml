@@ -1,0 +1,39 @@
+# /var/lib/docker/volumes/tango_shared/_data
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvnfs-shared
+  labels:
+    name: shared
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /var/lib/docker/volumes/tango_shared/_data
+    server: 192.168.0.181
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvcnfs-shared
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  volumeMode: Filesystem
+  selector:
+    matchLabels:
+      name: shared
+  accessModes:
+    - ReadWriteMany
+
