@@ -109,11 +109,11 @@ viz2code-7bbbdbb8b8-dwmxd          1/1     Running            0          3d2h
 
 ```
 
-### 웹 페이지에서 TANGO PAGE 접속
+### 웹 페이지에서 TANGO PAGE 접속 방법
 <img src="./docs/media/TANGO_web.png" alt="k8s image" width="600px"/>
 
 
-### 삭제 방법
+### 삭제 방법 확인함
 ```bash
 $ kubectl delete namespace  tango
 $ kubectl delete kubectl delete pv pvnfs-bms pvnfs-cloud-deploy  pvnfs-code-gen  pvnfs-labelling-datadb pvnfs-labelling-dataset pvnfs-ondevice-deploy pvnfs-postgresql pvnfs-prm pvnfs-resnet pvnfs-shared  pvnfs-viz2code pvnfs-yoloe
